@@ -1,27 +1,66 @@
-const express = require('express')
-const app = express()
-const { createServer } = require('http')
-const server = createServer(app)
+const express = require("express");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const cors = require("cors");
 
-const { Server } = require ("socket.io")
-const port = 3001
-const io = new Server(server,{
+const app = express();
+const server = createServer(app);
+const port = 3001;
+
+// Configurando o middleware CORS
+app.use(cors({ origin: "http://localhost:3000" }));
+
+// Inicializando o servidor Socket.io
+const io = new Server(server, {
 	cors: {
-		origin: "http://localhost:3000"
+		origin: "http://localhost:3000",
+		methods: ["GET", "POST"], // Limita os métodos permitidos
+	},
+});
+
+// Função para gerenciar quando o socket se conecta
+const handleConnection = (socket) => {
+	console.log(`A user connected: ${socket.id}`);
+
+	// Gerenciando evento de entrada em uma sala
+	socket.on("join_room", (user, room) => handleJoinRoom(socket, user, room));
+
+	// Gerenciando envio de mensagem para a sala
+	socket.on("send_message", (room, user, message) =>
+		handleSendMessage(socket, room, user, message)
+	);
+
+	// Gerenciando quando o usuário desconecta
+	socket.on("disconnect", () => {
+		console.log(`User disconnected: ${socket.id}`);
+	});
+};
+
+// Função para tratar quando o usuário entra em uma sala
+const handleJoinRoom = (socket, user, room) => {
+	if (room) {
+		socket.join(room);
+		console.log(`User ${user} joined room: ${room}`);
+	} else {
+		console.error("Room is undefined or null");
 	}
-})
+};
 
-io.on('connection', (socket) => {
-	console.log('a user connected: ${socket.id}')
-	socket.on('join_room', (user, room) => {
-		socket.join(room)
-	})
-	socket.on('send_message', (room, user, message) => {
-		const d = {user: user, message: message}
-		socket.to(room).emit('receive_message', d)
-	})
-})
+// Função para tratar o envio de mensagem
+const handleSendMessage = (socket, room, user, message) => {
+	if (room && user && message) {
+		const data = { user, message };
+		socket.to(room).emit("receive_message", data); // Envia a mensagem para os outros clientes na sala
+		console.log(`Message from ${user} in room ${room}: ${message}`);
+	} else {
+		console.error("Room, user or message is missing");
+	}
+};
 
+// Evento de conexão do socket
+io.on("connection", handleConnection);
+
+// Inicializando o servidor HTTP
 server.listen(port, () => {
-	console.log('listening on *:${port}')
-})
+	console.log(`Listening on port: ${port}`);
+});
