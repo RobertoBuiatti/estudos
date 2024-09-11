@@ -1,6 +1,8 @@
 # estudos
 Explicação:
 
+a
+
 Função ChatApp: Componente principal que gerencia o estado de conexão do usuário e a visibilidade do chat.
 Estados:
 user: Armazena o nome do usuário.
