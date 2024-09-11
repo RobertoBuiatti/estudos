@@ -14,13 +14,19 @@ app.use(cors({ origin: "http://localhost:3000" }));
 const io = new Server(server, {
 	cors: {
 		origin: "http://localhost:3000",
-		methods: ["GET", "POST"], // Limita os métodos permitidos
+		methods: ["GET", "POST"],
 	},
 });
+
+// Lista de salas
+const rooms = new Set();
 
 // Função para gerenciar quando o socket se conecta
 const handleConnection = (socket) => {
 	console.log(`A user connected: ${socket.id}`);
+
+	// Enviar lista de salas abertas para o cliente ao conectar
+	socket.emit("update_rooms", Array.from(rooms));
 
 	// Gerenciando evento de entrada em uma sala
 	socket.on("join_room", (user, room) => handleJoinRoom(socket, user, room));
@@ -43,6 +49,8 @@ const handleConnection = (socket) => {
 const handleJoinRoom = (socket, user, room) => {
 	if (room) {
 		socket.join(room);
+		rooms.add(room);
+		io.emit("update_rooms", Array.from(rooms)); // Atualiza a lista de salas para todos os clientes
 		console.log(`User ${user} joined room: ${room}`);
 	} else {
 		console.error("Room is undefined or null");
@@ -64,6 +72,12 @@ const handleSendMessage = (socket, room, user, message) => {
 const handleLeaveRoom = (socket, room) => {
 	if (room) {
 		socket.leave(room);
+		// Verificar se a sala está vazia antes de removê-la
+		const clients = io.sockets.adapter.rooms.get(room);
+		if (!clients || clients.size === 0) {
+			rooms.delete(room);
+		}
+		io.emit("update_rooms", Array.from(rooms)); // Atualiza a lista de salas para todos os clientes
 		console.log(`User ${socket.id} left room: ${room}`);
 	} else {
 		console.error("Room is undefined or null");
