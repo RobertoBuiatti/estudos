@@ -19,13 +19,13 @@ export default function MessageInput({ user, room, setMessages }) {
 		<div>
 			<input
 				type="text"
-				placeholder="Message"
+				placeholder="Mensagem"
 				value={newMessage}
 				onChange={(e) => setNewMessage(e.target.value)}
 				onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
 			/>
 			<button onClick={handleSendMessage} disabled={!newMessage.trim()}>
-				Send Message
+				Enviar Menssagem
 			</button>
 		</div>
 	);

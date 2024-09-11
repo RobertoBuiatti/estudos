@@ -29,11 +29,11 @@ export default function ChatRoom({ user, room, setChatIsVisible }) {
 	return (
 		<div>
 			<ConnectionStatus />
-			<h2>Chat Room: {room}</h2>
-			<h3>User: {user}</h3>
+			<h2>Sala: {room}</h2>
+			<h3>Usuário: {user}</h3>
 			<MessageList messages={messages} />
 			<MessageInput user={user} room={room} setMessages={setMessages} />
-			<button onClick={handleDisconnect}>Disconnect</button>
+			<button onClick={handleDisconnect}>Desconectar</button>
 		</div>
 	);
 }

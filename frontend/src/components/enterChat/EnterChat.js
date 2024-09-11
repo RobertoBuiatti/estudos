@@ -3,20 +3,20 @@ export default function EnterChat({ user, room, setUser, setRoom, handleEnterCha
 		<div>
 			<input
 				type="text"
-				placeholder="User"
+				placeholder="Usuario"
 				value={user}
 				onChange={(e) => setUser(e.target.value)}
 				style={{ marginBottom: 10 }}
 			/>
 			<input
 				type="text"
-				placeholder="Room"
+				placeholder="Sala"
 				value={room}
 				onChange={(e) => setRoom(e.target.value)}
 				style={{ marginBottom: 10 }}
 			/>
 			<button onClick={handleEnterChatRoom} disabled={!user || !room}>
-				Enter Chat Room
+				Entrar Na sala
 			</button>
 		</div>
 	);

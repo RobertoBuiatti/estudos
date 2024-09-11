@@ -25,7 +25,7 @@ const rooms = new Set();
 const handleConnection = (socket) => {
 	console.log(`A user connected: ${socket.id}`);
 
-	// Enviar lista de salas abertas para o cliente ao conectar
+	// Enviar lista de salas abertas para o cliente
 	socket.emit("update_rooms", Array.from(rooms));
 
 	// Gerenciando evento de entrada em uma sala
@@ -72,11 +72,7 @@ const handleSendMessage = (socket, room, user, message) => {
 const handleLeaveRoom = (socket, room) => {
 	if (room) {
 		socket.leave(room);
-		// Verificar se a sala está vazia antes de removê-la
-		const clients = io.sockets.adapter.rooms.get(room);
-		if (!clients || clients.size === 0) {
-			rooms.delete(room);
-		}
+		rooms.delete(room);
 		io.emit("update_rooms", Array.from(rooms)); // Atualiza a lista de salas para todos os clientes
 		console.log(`User ${socket.id} left room: ${room}`);
 	} else {
