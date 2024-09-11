@@ -4,7 +4,7 @@ import MessageInput from "../messageInput/MessageInput";
 import MessageList from "../messageList/MessageList";
 import ConnectionStatus from "../connectionStatus/ConnectionStatus";
 
-function ChatRoom({ user, room }) {
+export default function ChatRoom({ user, room, setChatIsVisible }) {
 	const [messages, setMessages] = useState([]);
 
 	useEffect(() => {
@@ -17,8 +17,14 @@ function ChatRoom({ user, room }) {
 
 		return () => {
 			socket.off("receive_message");
+			socket.emit("leave_room", room); // Informar o servidor que o usuário está saindo
 		};
 	}, [user, room]);
+
+	const handleDisconnect = () => {
+		socket.emit("leave_room", room);
+		setChatIsVisible(false); // Ajuste aqui
+	};
 
 	return (
 		<div>
@@ -27,8 +33,7 @@ function ChatRoom({ user, room }) {
 			<h3>User: {user}</h3>
 			<MessageList messages={messages} />
 			<MessageInput user={user} room={room} setMessages={setMessages} />
+			<button onClick={handleDisconnect}>Disconnect</button>
 		</div>
 	);
 }
-
-export default ChatRoom;

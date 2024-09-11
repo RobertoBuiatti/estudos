@@ -30,6 +30,9 @@ const handleConnection = (socket) => {
 		handleSendMessage(socket, room, user, message)
 	);
 
+	// Gerenciando evento de saída da sala
+	socket.on("leave_room", (room) => handleLeaveRoom(socket, room));
+
 	// Gerenciando quando o usuário desconecta
 	socket.on("disconnect", () => {
 		console.log(`User disconnected: ${socket.id}`);
@@ -54,6 +57,16 @@ const handleSendMessage = (socket, room, user, message) => {
 		console.log(`Message from ${user} in room ${room}: ${message}`);
 	} else {
 		console.error("Room, user or message is missing");
+	}
+};
+
+// Função para tratar quando o usuário sai da sala
+const handleLeaveRoom = (socket, room) => {
+	if (room) {
+		socket.leave(room);
+		console.log(`User ${socket.id} left room: ${room}`);
+	} else {
+		console.error("Room is undefined or null");
 	}
 };
 

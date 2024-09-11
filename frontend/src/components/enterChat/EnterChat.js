@@ -1,4 +1,4 @@
-function EnterChat({ user, room, setUser, setRoom, handleEnterChatRoom }) {
+export default function EnterChat({ user, room, setUser, setRoom, handleEnterChatRoom }) {
 	return (
 		<div>
 			<input
@@ -21,5 +21,3 @@ function EnterChat({ user, room, setUser, setRoom, handleEnterChatRoom }) {
 		</div>
 	);
 }
-
-export default EnterChat;

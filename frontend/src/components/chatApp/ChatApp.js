@@ -2,7 +2,7 @@ import { useState } from "react";
 import ChatRoom from "../chatRoom/ChatRoom";
 import EnterChat from "../enterChat/EnterChat";
 
-function ChatApp() {
+export default function ChatApp() {
 	const [user, setUser] = useState("");
 	const [room, setRoom] = useState("");
 	const [chatIsVisible, setChatIsVisible] = useState(false);
@@ -24,10 +24,8 @@ function ChatApp() {
 					handleEnterChatRoom={handleEnterChatRoom}
 				/>
 			) : (
-				<ChatRoom user={user} room={room} />
+				<ChatRoom user={user} room={room} setChatIsVisible={setChatIsVisible} />
 			)}
 		</div>
 	);
 }
-
-export default ChatApp;

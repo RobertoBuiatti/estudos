@@ -1,7 +1,7 @@
 import { useState } from "react";
 import socket from "../socket/socket";
 
-function MessageInput({ user, room, setMessages }) {
+export default function MessageInput({ user, room, setMessages }) {
 	const [newMessage, setNewMessage] = useState("");
 
 	const handleSendMessage = () => {
@@ -30,5 +30,3 @@ function MessageInput({ user, room, setMessages }) {
 		</div>
 	);
 }
-
-export default MessageInput;

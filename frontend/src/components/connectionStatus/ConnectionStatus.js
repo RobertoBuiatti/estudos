@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import socket from "../socket/socket";
 
-function ConnectionStatus() {
+export default function ConnectionStatus() {
 	const [isConnected, setIsConnected] = useState(socket.connected);
 
 	useEffect(() => {
@@ -21,5 +21,3 @@ function ConnectionStatus() {
 
 	return <p>Status: {isConnected ? "Connected" : "Disconnected"}</p>;
 }
-
-export default ConnectionStatus;

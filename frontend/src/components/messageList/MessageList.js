@@ -1,4 +1,4 @@
-function MessageList({ messages }) {
+export default function MessageList({ messages }) {
 	return (
 		<div style={{ marginBottom: 10 }}>
 			{messages.map((msg, index) => (
@@ -7,5 +7,3 @@ function MessageList({ messages }) {
 		</div>
 	);
 }
-
-export default MessageList;
