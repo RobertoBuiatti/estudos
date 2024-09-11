@@ -18,15 +18,12 @@ const io = new Server(server, {
 	},
 });
 
-// Lista de salas
-const rooms = new Set();
+// Armazenar as salas e os usuários conectados
+const rooms = {};
 
 // Função para gerenciar quando o socket se conecta
 const handleConnection = (socket) => {
 	console.log(`A user connected: ${socket.id}`);
-
-	// Enviar lista de salas abertas para o cliente
-	socket.emit("update_rooms", Array.from(rooms));
 
 	// Gerenciando evento de entrada em uma sala
 	socket.on("join_room", (user, room) => handleJoinRoom(socket, user, room));
@@ -42,6 +39,7 @@ const handleConnection = (socket) => {
 	// Gerenciando quando o usuário desconecta
 	socket.on("disconnect", () => {
 		console.log(`User disconnected: ${socket.id}`);
+		handleUserDisconnect(socket); // Nova função para tratar desconexões
 	});
 };
 
@@ -49,9 +47,13 @@ const handleConnection = (socket) => {
 const handleJoinRoom = (socket, user, room) => {
 	if (room) {
 		socket.join(room);
-		rooms.add(room);
-		io.emit("update_rooms", Array.from(rooms)); // Atualiza a lista de salas para todos os clientes
+		if (!rooms[room]) {
+			rooms[room] = []; // Inicializa a sala se ela não existir
+		}
+		rooms[room].push(socket.id); // Adiciona o usuário à sala
+
 		console.log(`User ${user} joined room: ${room}`);
+		console.log(`Users in room ${room}:`, rooms[room]);
 	} else {
 		console.error("Room is undefined or null");
 	}
@@ -72,11 +74,28 @@ const handleSendMessage = (socket, room, user, message) => {
 const handleLeaveRoom = (socket, room) => {
 	if (room) {
 		socket.leave(room);
-		rooms.delete(room);
-		io.emit("update_rooms", Array.from(rooms)); // Atualiza a lista de salas para todos os clientes
-		console.log(`User ${socket.id} left room: ${room}`);
+		if (rooms[room]) {
+			rooms[room] = rooms[room].filter((id) => id !== socket.id); // Remove o usuário da sala
+			console.log(`User ${socket.id} left room: ${room}`);
+			console.log(`Remaining users in room ${room}:`, rooms[room]);
+
+			if (rooms[room].length === 0) {
+				// Se não houver mais usuários na sala, remove a sala
+				delete rooms[room];
+				console.log(`Room ${room} closed because no users are left.`);
+			}
+		}
 	} else {
 		console.error("Room is undefined or null");
+	}
+};
+
+// Função para tratar quando o usuário desconecta
+const handleUserDisconnect = (socket) => {
+	for (const room in rooms) {
+		if (rooms[room].includes(socket.id)) {
+			handleLeaveRoom(socket, room); // Remove o usuário da sala ao desconectar
+		}
 	}
 };
 

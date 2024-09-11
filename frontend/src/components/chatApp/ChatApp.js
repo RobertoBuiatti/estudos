@@ -5,27 +5,30 @@ import RoomList from "../roomList/RoomList";
 import socket from "../socket/socket";
 
 export default function ChatApp() {
-	const [user, setUser] = useState("");
-	const [room, setRoom] = useState("");
+	const [user, setUser] = useState(localStorage.getItem("user") || "");
+	const [room, setRoom] = useState(localStorage.getItem("room") || "");
 	const [chatIsVisible, setChatIsVisible] = useState(false);
+
+	// Armazenar usuário e sala no localStorage sempre que forem definidos
+	useEffect(() => {
+		if (user) localStorage.setItem("user", user);
+		if (room) localStorage.setItem("room", room);
+	}, [user, room]);
+
+	// Tentar entrar na sala automaticamente ao carregar a página, se houver user e room
+	useEffect(() => {
+		if (user && room) {
+			setChatIsVisible(true);
+			socket.emit("join_room", user, room); // Entra na sala automaticamente
+		}
+	}, [user, room]);
 
 	const handleEnterChatRoom = () => {
 		if (user && room) {
 			setChatIsVisible(true);
+			socket.emit("join_room", user, room); // Quando o usuário entra em uma sala
 		}
 	};
-
-	useEffect(() => {
-		// Atualizar lista de salas quando o componente monta
-		socket.on("update_rooms", (updatedRooms) => {
-			// Aqui, você pode armazenar a lista de salas no estado ou usar uma abordagem semelhante
-			// para garantir que a lista de salas esteja atualizada.
-		});
-
-		return () => {
-			socket.off("update_rooms");
-		};
-	}, []);
 
 	return (
 		<div style={{ padding: 20 }}>

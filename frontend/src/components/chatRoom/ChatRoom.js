@@ -8,6 +8,10 @@ export default function ChatRoom({ user, room, setChatIsVisible }) {
 	const [messages, setMessages] = useState([]);
 
 	useEffect(() => {
+		// Armazenar user e room no localStorage
+		localStorage.setItem("user", user);
+		localStorage.setItem("room", room);
+
 		socket.emit("join_room", user, room);
 
 		socket.on("receive_message", ({ user, message }) => {
@@ -18,12 +22,18 @@ export default function ChatRoom({ user, room, setChatIsVisible }) {
 		return () => {
 			socket.off("receive_message");
 			socket.emit("leave_room", room); // Informar o servidor que o usuário está saindo
+			// Limpar os dados do localStorage quando sair da sala
+			localStorage.removeItem("user");
+			localStorage.removeItem("room");
 		};
 	}, [user, room]);
 
 	const handleDisconnect = () => {
 		socket.emit("leave_room", room);
-		setChatIsVisible(false); // Ajuste aqui
+		// Limpar os dados do localStorage ao desconectar
+		localStorage.removeItem("user");
+		localStorage.removeItem("room");
+		setChatIsVisible(false); // Voltar para a tela de entrada
 	};
 
 	return (
