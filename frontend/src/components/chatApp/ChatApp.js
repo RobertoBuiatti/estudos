@@ -54,5 +54,8 @@ export default function ChatApp() {
 				/>
 			)}
 		</div>
+		<div>
+			<h1>Faz o L</h1>			
+		</div>
 	);
 }
